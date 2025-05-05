@@ -21,7 +21,7 @@ async function getNotes() {
   return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : [];
 }
 
-async function removeNote(id) {
+async function remove(id) {
   const notes = await getNotes();
   const initialLength = notes.length;
 
@@ -36,16 +36,7 @@ async function removeNote(id) {
   console.log(chalk.bgRed(`Note with id: ${id} was deleted`));
 }
 
-async function printNotes() {
-  const notes = await getNotes();
-
-  console.log(chalk.bgBlue("Here is the list of notes: "));
-  notes.forEach((note) => {
-    console.log(chalk.blue(`${note.id} ${note.title}`));
-  });
-}
-
-async function updateNote(id, title) {
+async function edit(id, title) {
   const notes = await getNotes();
   const noteIndex = notes.findIndex((note) => note.id === id);
 
@@ -60,10 +51,18 @@ async function updateNote(id, title) {
   await fs.writeFile(notesPath, JSON.stringify(notes));
 }
 
+async function printNotes() {
+  const notes = await getNotes();
+
+  console.log(chalk.bgBlue("Here is the list of notes: "));
+  notes.forEach((note) => {
+    console.log(chalk.blue(`${note.id} ${note.title}`));
+  });
+}
+
 module.exports = {
   addNote,
   printNotes,
-  removeNote,
-  getNotes,
-  updateNote,
+  remove,
+  edit,
 };
