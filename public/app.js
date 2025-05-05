@@ -7,18 +7,36 @@ document.addEventListener("click", (event) => {
   }
 
   if (event.target.dataset.type === "update") {
+    const $task = event.target.closest("li");
     const id = event.target.dataset.id;
-    const newTitle = prompt("Введите новое название: ", "");
+    const title = event.target.dataset.title;
+    const initialHtml = $task.innerHTML;
 
-    if (newTitle !== null && newTitle.trim() !== "") {
-      update(id, newTitle).then(() => {
-        const titleElement = event.target.closest("li").firstChild;
+    $task.innerHTML = `
+      <input type="text" value="${title}">
+      <div>
+        <button class="btn btn-success" data-type="save">Сохранить</button>
+        <button class="btn btn-danger" data-type="cancel">Отменить</button>
+      </div>
+    `;
 
-        if (titleElement) {
-          titleElement.textContent = newTitle;
-        }
-      });
-    }
+    const taskListener = ({ target }) => {
+      if (target.dataset.type === "cancel") {
+        $task.innerHTML = initialHtml;
+        $task.removeEventListener("click", taskListener);
+      }
+      if (target.dataset.type === "save") {
+        const title = $task.querySelector("input").value;
+        update(id, title).then(() => {
+          $task.innerHTML = initialHtml;
+          $task.firstChild.textContent = title;
+          $task.querySelector("[data-type=update]").dataset.title = title;
+          $task.removeEventListener("click", taskListener);
+        });
+      }
+    };
+
+    $task.addEventListener("click", taskListener);
   }
 });
 
